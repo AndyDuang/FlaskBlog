@@ -3,29 +3,42 @@ from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
+from flaskblog.config import Config
 
-app = Flask(__name__)
-
-app.config['SECRET_KEY'] = '90ce5a417f49cf1c6c1a052e8604b233'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)
-login_manager = LoginManager(app)
-login_manager.login_view = 'login'
+db = SQLAlchemy()
+bcrypt = Bcrypt()
+login_manager = LoginManager()
+login_manager.login_view = 'users.login'
 login_manager.login_message_category = 'info'
-app.config['MAIL_SERVER'] = 'smtp.163.com'
-app.config['MAIL_PORT'] = 25
-app.config['MAIL_USE_TLS'] = True
-# app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-# app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_USERNAME'] = '18801095270@163.com'
-app.config['MAIL_PASSWORD'] = 'ACLUTATAGPUINPHV'
-mail = Mail(app)
 
-from flaskblog.users.routes import users
-from flaskblog.posts.routes import posts
-from flaskblog.main.routes import main
+mail = Mail()
 
-app.register_blueprint(users)
-app.register_blueprint(posts)
-app.register_blueprint(main)
+
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
+    db.init_app(app)
+
+    '''
+    # 在db初始化完成之后才能从models中导入，否则会报错（cannot import name 'db' from 'flaskblog'）
+    # 必须在__init__.py中导入models，这样才会执行User类和Post类的代码，从而利用create_all()方法生成数据库表
+    from flaskblog.models import User, Post
+    with app.app_context():
+        db.create_all(app=app)
+    '''
+    bcrypt.init_app(app)
+    login_manager.init_app(app)
+    mail.init_app(app)
+
+    from flaskblog.users.routes import users
+    from flaskblog.posts.routes import posts
+    from flaskblog.main.routes import main
+    from flaskblog.errors.handlers import errors
+
+    app.register_blueprint(users)
+    app.register_blueprint(posts)
+    app.register_blueprint(main)
+    app.register_blueprint(errors)
+
+    return app
