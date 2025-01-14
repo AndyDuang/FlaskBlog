@@ -25,7 +25,7 @@ def create_app(config_class=Config):
     # 必须在__init__.py中导入models，这样才会执行User类和Post类的代码，从而利用create_all()方法生成数据库表
     from flaskblog.models import User, Post
     with app.app_context():
-        db.create_all(app=app)
+        db.create_all()
     '''
     bcrypt.init_app(app)
     login_manager.init_app(app)

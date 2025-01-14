@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from flaskblog import db, login_manager
 from flask import current_app
 from flask_login import UserMixin
-from jose import jwt
+import jwt
 
 
 @login_manager.user_loader
@@ -31,11 +31,11 @@ class User(db.Model, UserMixin):
             'iat': datetime.utcnow(),
             'user_id': self.id
         }
-        return jwt.encode(claims=payload, key=current_app.config['SECRET_KEY'])
+        return jwt.encode(payload=payload, key=current_app.config['SECRET_KEY'], algorithm='HS256')
 
     @staticmethod
     def verify_reset_token(token):
-        payload = jwt.decode(token, current_app.config['SECRET_KEY'])
+        payload = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
         try:
             user_id = payload['user_id']
         except:

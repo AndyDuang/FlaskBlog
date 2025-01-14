@@ -15,7 +15,7 @@ class Config:
     PORT = '3306'
     DATA_BASE = 'flaskblog'
     DATA_BASE_USER_NAME = 'root'
-    DATA_BASE_USER_PASSWORD = '123456'
+    DATA_BASE_USER_PASSWORD = 'root'
     DB_URI = 'mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8'.format(DATA_BASE_USER_NAME, DATA_BASE_USER_PASSWORD,
                                                                   HOST_NAME, PORT, DATA_BASE)
     SQLALCHEMY_DATABASE_URI = DB_URI
